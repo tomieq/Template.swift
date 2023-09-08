@@ -26,7 +26,7 @@ Swift code:
 ```swift
 let template = Template(from: "response.tpl.html")
 for i in 1...3 {
-    template.assign(["number": i])
+    template.assign(["number": i], inNest: "item")
 }
 template.assign(["name": "Thomas"])
 let output = template.output
