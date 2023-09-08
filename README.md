@@ -77,3 +77,19 @@ Heavy load can cause IO problems, so it is recommended to keep template's file c
 ```swift
 let template = Template.cahed(from: "response.tpl.html")
 ```
+
+### Swift Package Manager
+```
+    
+    dependencies: [
+        .package(url: "https://github.com/tomieq/Template.swift.git", .branch("master"))
+    ],
+    
+    ...
+    
+    .executableTarget(
+        name: "YourApp",
+        dependencies: [
+                       .product(name: "Template", package: "Template.swift")
+                       ]),
+```
