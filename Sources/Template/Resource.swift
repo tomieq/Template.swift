@@ -14,12 +14,12 @@ public struct Resource {
         self.workingDir = workingDir
     }
 
-    private func resourcePath(for relativePath: String) -> String {
+    public func absolutePath(for relativePath: String) -> String {
         "\(self.workingDir)/Resources/\(relativePath)"
     }
 
     public func content(for relativePath: String) -> String? {
-        let resourcePath = resourcePath(for: relativePath)
+        let resourcePath = absolutePath(for: relativePath)
         guard let content = try? String(contentsOfFile: resourcePath) else {
             print("Template.Resource: file not found at \(resourcePath)")
             return nil
