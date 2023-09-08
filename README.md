@@ -42,6 +42,35 @@ let template = Template(raw: res.content(for: "response.tpl.html"))
 let template = Template(from: "response.tpl.html")
 ```
 In case resource will not find the file it returns nil. Template will be initialized with empty String.
+
+
+Typical cooperation with Swifter:
+```swift
+        server.notFoundHandler = { request, responseHeaders in
+            request.disableKeepAlive = true
+            let filePath = Resource().absolutePath(for: request.path)
+            if FileManager.default.fileExists(atPath: filePath) {
+                guard let file = try? filePath.openForReading() else {
+                    print("Could not open `\(filePath)`")
+                    return .notFound()
+                }
+                let mimeType = filePath.mimeType()
+                responseHeaders.addHeader("Content-Type", mimeType)
+
+                if let attr = try? FileManager.default.attributesOfItem(atPath: filePath),
+                   let fileSize = attr[FileAttributeKey.size] as? UInt64 {
+                    responseHeaders.addHeader("Content-Length", String(fileSize))
+                }
+
+                return .raw(200, "OK", { writer in
+                    try writer.write(file)
+                    file.close()
+                })
+            }
+            print("File `\(filePath)` doesn't exist")
+            return .notFound()
+        }
+```
 ### Cache
 
 Heavy load can cause IO problems, so it is recommended to keep template's file content cached instead of reading it from hard disc. The library has in-build caching system that loads the resources only once and then keep them in the memory.
