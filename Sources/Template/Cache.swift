@@ -11,11 +11,13 @@ class Cache {
     static let shared = Cache()
     var templates: [String: String] = [:]
 
-    func get(path: String) -> String {
+    func get(path: String) -> String? {
         if let cached = templates[path] {
             return cached
         }
-        let content = Resource().content(for: path)
+        guard let content = Resource().content(for: path) else {
+            return nil
+        }
         self.templates[path] = content
         return content
     }

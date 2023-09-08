@@ -41,7 +41,7 @@ let template = Template(raw: res.content(for: "response.tpl.html"))
 // or
 let template = Template(from: "response.tpl.html")
 ```
-
+In case resource will not find the file it returns nil. Template will be initialized with empty String.
 ### Cache
 
 Heavy load can cause IO problems, so it is recommended to keep template's file content cached instead of reading it from hard disc. The library has in-build caching system that loads the resources only once and then keep them in the memory.

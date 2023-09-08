@@ -9,6 +9,6 @@ import Foundation
 
 public extension Template {
     convenience init(from relativePath: String) {
-        self.init(raw: Resource().content(for: relativePath))
+        self.init(raw: Resource().content(for: relativePath) ?? "")
     }
 }
