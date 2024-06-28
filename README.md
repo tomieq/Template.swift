@@ -13,6 +13,16 @@ let template = Template(from: "response.tpl.html")
 template.assign(["name": "Thomas"])
 let output = template.output
 ```
+You can also pass data with `class` or `struct` instance:
+```swift
+struct ViewModel {
+    let name: String
+    let number: Int
+}
+let template = Template(raw: "{number} {name}")
+let model = ViewModel(name: "Tom", number: 45)
+template.assign(model)
+```
 ## Template's interation variables
 Sample temaplate:
 ```

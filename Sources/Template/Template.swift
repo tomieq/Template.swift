@@ -7,6 +7,8 @@
 
 import Foundation
 
+public typealias TemplateVariables = [String:CustomStringConvertible]
+
 public class Template {
     private var content: String = ""
     private let contentCache: String
@@ -67,10 +69,10 @@ public class Template {
         return "{nest-\(name)}"
     }
 
-    public func assign(_ variables: [String: CustomStringConvertible]?, inNest nestName: String) {
+    public func assign(_ variables: TemplateVariables, inNest nestName: String) {
         if let nestContent = nestedContent[nestName] {
-            var content = "\(nestContent)"
-            for variable in variables ?? [:] {
+            var content = nestContent
+            for variable in variables {
                 content = content.replacingOccurrences(of: "{\(variable.key)}", with: "\(variable.value)")
             }
             let nestTag = self.nestTag(nestName)
@@ -78,9 +80,33 @@ public class Template {
         }
     }
 
-    public func assign(_ variables: [String: CustomStringConvertible]) {
+    public func assign(_ model: Any, inNest nestName: String) {
+        let mirror = Mirror(reflecting: model)
+        var variables = TemplateVariables()
+        mirror.children.forEach { child in
+            if let key = child.label, let value = child.value as? CustomStringConvertible {
+                variables[key] = value
+            }
+        }
+        self.assign(variables, inNest: nestName)
+    }
+
+    public func assign(_ key: String, _ value: CustomStringConvertible) {
+        self.content = self.content.replacingOccurrences(of: "{\(key)}", with: "\(value)")
+    }
+    
+    public func assign(_ variables: TemplateVariables) {
         for variable in variables {
-            self.content = self.content.replacingOccurrences(of: "{\(variable.key)}", with: "\(variable.value)")
+            self.assign(variable.key, variable.value)
+        }
+    }
+    
+    public func assign(_ model: Any) {
+        let mirror = Mirror(reflecting: model)
+        mirror.children.forEach { child in
+            if let key = child.label, let value = child.value as? CustomStringConvertible {
+                self.assign(key, value)
+            }
         }
     }
 
