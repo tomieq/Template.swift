@@ -8,11 +8,11 @@
 import Foundation
 
 extension Template {
-    public static func cahed(relativePath: String) -> Template {
+    public static func cached(relativePath: String) -> Template {
         Template(raw: Cache.shared.get(relativePath: relativePath) ?? "")
     }
 
-    public static func cahed(absolutePath: String) -> Template {
+    public static func cached(absolutePath: String) -> Template {
         Template(raw: Cache.shared.get(absolutePath: absolutePath) ?? "")
     }
 }
