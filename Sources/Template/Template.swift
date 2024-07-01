@@ -20,7 +20,8 @@ public class Template {
         self.reset()
     }
 
-    public func reset() {
+    @discardableResult
+    public func reset() -> Template {
         self.content = self.contentCache
         self.nestedContent = [:]
 
@@ -43,6 +44,7 @@ public class Template {
         for txt in nests {
             self.content = self.content.replacingOccurrences(of: txt.value, with: self.nestTag(txt.key))
         }
+        return self
     }
 
     private func subContent(from range: NSRange) -> String {
@@ -69,7 +71,8 @@ public class Template {
         return "{nest-\(name)}"
     }
 
-    public func assign(_ variables: TemplateVariables, inNest nestName: String) {
+    @discardableResult
+    public func assign(_ variables: TemplateVariables, inNest nestName: String) -> Template {
         if let nestContent = nestedContent[nestName] {
             var content = nestContent
             for variable in variables {
@@ -78,9 +81,11 @@ public class Template {
             let nestTag = self.nestTag(nestName)
             self.content = self.content.replacingOccurrences(of: nestTag, with: "\(content)\(nestTag)")
         }
+        return self
     }
 
-    public func assign(_ model: Any, inNest nestName: String) {
+    @discardableResult
+    public func assign(_ model: Any, inNest nestName: String) -> Template {
         let mirror = Mirror(reflecting: model)
         var variables = TemplateVariables()
         mirror.children.forEach { child in
@@ -88,26 +93,32 @@ public class Template {
                 variables[key] = value
             }
         }
-        self.assign(variables, inNest: nestName)
+        return self.assign(variables, inNest: nestName)
     }
 
-    public func assign(_ key: String, _ value: CustomStringConvertible) {
+    @discardableResult
+    public func assign(_ key: String, _ value: CustomStringConvertible) -> Template {
         self.content = self.content.replacingOccurrences(of: "{\(key)}", with: "\(value)")
+        return self
     }
     
-    public func assign(_ variables: TemplateVariables) {
+    @discardableResult
+    public func assign(_ variables: TemplateVariables) -> Template {
         for variable in variables {
             self.assign(variable.key, variable.value)
         }
+        return self
     }
     
-    public func assign(_ model: Any) {
+    @discardableResult
+    public func assign(_ model: Any) -> Template {
         let mirror = Mirror(reflecting: model)
         mirror.children.forEach { child in
             if let key = child.label, let value = child.value as? CustomStringConvertible {
                 self.assign(key, value)
             }
         }
+        return self
     }
 
     public var output: String {
