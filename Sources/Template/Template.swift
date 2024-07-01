@@ -125,3 +125,9 @@ extension Template {
         return Template(raw: content)
     }
 }
+
+extension Template: CustomStringConvertible {
+    public var description: String {
+        self.output
+    }
+}
