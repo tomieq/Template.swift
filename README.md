@@ -49,7 +49,9 @@ let res = Resource()
 
 let template = Template(raw: res.content(for: "response.tpl.html"))
 // or
-let template = Template(from: "response.tpl.html")
+let template = Template.load(absolutePath: "/web/app/Resources/response.tpl.html")
+// or relative to the working dir that app was started, it searches files in the `Resources` folder:
+let template = Template.load(relativePath: "response.tpl.html")
 ```
 In case resource will not find the file it returns nil. Template will be initialized with empty String.
 
@@ -57,25 +59,9 @@ In case resource will not find the file it returns nil. Template will be initial
 Typical cooperation with Swifter:
 ```swift
         server.notFoundHandler = { request, responseHeaders in
-            request.disableKeepAlive = true
             let filePath = Resource().absolutePath(for: request.path)
-            if FileManager.default.fileExists(atPath: filePath) {
-                guard let file = try? filePath.openForReading() else {
-                    print("Could not open `\(filePath)`")
-                    return .notFound()
-                }
-                let mimeType = filePath.mimeType()
-                responseHeaders.addHeader("Content-Type", mimeType)
-
-                if let attr = try? FileManager.default.attributesOfItem(atPath: filePath),
-                   let fileSize = attr[FileAttributeKey.size] as? UInt64 {
-                    responseHeaders.addHeader("Content-Length", String(fileSize))
-                }
-
-                return .raw(200, "OK", { writer in
-                    try writer.write(file)
-                    file.close()
-                })
+            if let response = HttpFileResponse.with(absolutePath: filePath, responseHeaders: responseHeaders) {
+                return response
             }
             print("File `\(filePath)` doesn't exist")
             return .notFound()

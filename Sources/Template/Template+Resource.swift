@@ -8,7 +8,7 @@
 import Foundation
 
 public extension Template {
-    convenience init(from relativePath: String) {
-        self.init(raw: Resource().content(for: relativePath) ?? "")
+    static func load(relativePath: String) -> Template {
+        Template.load(absolutePath: Resource().absolutePath(for: relativePath))
     }
 }

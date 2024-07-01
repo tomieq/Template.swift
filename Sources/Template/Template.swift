@@ -115,3 +115,13 @@ public class Template {
         return self.content
     }
 }
+
+extension Template {
+    public static func load(absolutePath: String) -> Template {
+        guard let content = try? String(contentsOfFile: absolutePath) else {
+            print("Template.Resource: file not found at \(absolutePath)")
+            return Template(raw: "")
+        }
+        return Template(raw: content)
+    }
+}
