@@ -9,8 +9,8 @@ This is sample template with variable {name}
 ```
 Swift code:
 ```swift
-let template = Template(from: "response.tpl.html")
-template.assign(["name": "Thomas"])
+let template = Template.load(relativePath: "response.tpl.html")
+template.assign("name", Thomas")
 let output = template.output
 ```
 You can also pass data with `class` or `struct` instance:
@@ -71,7 +71,9 @@ Typical cooperation with Swifter:
 
 Heavy load can cause IO problems, so it is recommended to keep template's file content cached instead of reading it from hard disc. The library has in-build caching system that loads the resources only once and then keep them in the memory.
 ```swift
-let template = Template.cahed(from: "response.tpl.html")
+let template = Template.cahed(relativePath: "response.tpl.html")
+// or
+let template = Template.cahed(absolutePath: "/web/app/Resources/response.tpl.html")
 ```
 
 ### Swift Package Manager

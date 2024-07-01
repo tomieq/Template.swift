@@ -9,16 +9,20 @@ import Foundation
 
 class Cache {
     static let shared = Cache()
-    var templates: [String: String] = [:]
+    var fileContents: [String: String] = [:]
 
-    func get(path: String) -> String? {
-        if let cached = templates[path] {
+    func get(relativePath: String) -> String? {
+        self.get(absolutePath: Resource().absolutePath(for: relativePath))
+    }
+    
+    func get(absolutePath: String) -> String? {
+        if let cached = fileContents[absolutePath] {
             return cached
         }
-        guard let content = Resource().content(for: path) else {
+        guard let content = try? String(contentsOfFile: absolutePath) else {
             return nil
         }
-        self.templates[path] = content
+        self.fileContents[absolutePath] = content
         return content
     }
 }

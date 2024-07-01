@@ -2,13 +2,17 @@
 //  Template+Cache.swift
 //
 //
-//  Created by Tomasz KUCHARSKI on 08/09/2023.
+//  Created by Tomasz on 08/09/2023.
 //
 
 import Foundation
 
-public extension Template {
-    static func cahed(from relativePath: String) -> Template {
-        Template(raw: Cache.shared.get(path: relativePath) ?? "")
+extension Template {
+    public static func cahed(relativePath: String) -> Template {
+        Template(raw: Cache.shared.get(relativePath: relativePath) ?? "")
+    }
+
+    public static func cahed(absolutePath: String) -> Template {
+        Template(raw: Cache.shared.get(absolutePath: absolutePath) ?? "")
     }
 }
