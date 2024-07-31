@@ -87,7 +87,7 @@ let template = Template.cahed(absolutePath: "/web/app/Resources/response.tpl.htm
 ```
     
     dependencies: [
-        .package(url: "https://github.com/tomieq/Template.swift.git", .branch("master"))
+        .package(url: "https://github.com/tomieq/Template.swift.git", from: "1.5.0")
     ],
     
     ...
@@ -95,6 +95,6 @@ let template = Template.cahed(absolutePath: "/web/app/Resources/response.tpl.htm
     .executableTarget(
         name: "YourApp",
         dependencies: [
-                       .product(name: "Template", package: "Template.swift")
-                       ]),
+            .product(name: "Template", package: "Template.swift")
+        ]),
 ```
