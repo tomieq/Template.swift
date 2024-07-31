@@ -102,7 +102,7 @@ public class Template {
         return self
     }
     
-    subscript(_ key: String) -> CustomStringConvertible? {
+    public subscript(_ key: String) -> CustomStringConvertible? {
         set {
             guard let value = newValue else { return }
             assign(key, value)
