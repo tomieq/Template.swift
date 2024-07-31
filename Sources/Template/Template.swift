@@ -102,6 +102,16 @@ public class Template {
         return self
     }
     
+    subscript(_ key: String) -> CustomStringConvertible? {
+        set {
+            guard let value = newValue else { return }
+            assign(key, value)
+        }
+        get {
+            nil
+        }
+    }
+    
     @discardableResult
     public func assign(_ variables: TemplateVariables) -> Template {
         for variable in variables {

@@ -5,12 +5,14 @@ Template is a swift library for loading String templates from files. It allows a
 ## Template's variables
 Sample temaplate:
 ```
-This is sample template with variable {name}
+This is sample template with variable {name} and number {number}
 ```
 Swift code:
 ```swift
 let template = Template.load(relativePath: "response.tpl.html")
 template.assign("name", Thomas")
+// or even simplier
+template["number"] = 502
 let output = template.output
 ```
 You can also pass data with `class` or `struct` instance:
@@ -22,6 +24,11 @@ struct ViewModel {
 let template = Template(raw: "{number} {name}")
 let model = ViewModel(name: "Tom", number: 45)
 template.assign(model)
+```
+You can pass multiple variables from dictionary as well:
+```swift
+let template = Template(raw: "{number} {name}")
+template.assign(["number": 875, "name": "Tom"])
 ```
 ## Template's interation variables
 Sample temaplate:

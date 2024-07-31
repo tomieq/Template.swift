@@ -51,4 +51,10 @@ final class TemplateTests: XCTestCase {
         }
         XCTAssertEqual("welcomei1i2i3120", template.output)
     }
+    
+    func testSubscriptAssign() throws {
+        let template = Template(raw: "{number}")
+        template["number"] = 406
+        XCTAssertEqual("406", template.output)
+    }
 }
