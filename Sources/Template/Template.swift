@@ -14,9 +14,11 @@ public class Template {
     private let contentCache: String
     private var nestedContent: [String: String] = [:]
     private let nestPattern = #"(\[START)[(\s)+]([a-zA-Z0-9-_]+)\](.+?)(\[END\s[a-zA-Z0-9-_]+\])"#
+    private let interpolation: TemplateInterpolation
 
-    public init(raw: String) {
+    public init(raw: String, interpolation: TemplateInterpolation = .default) {
         self.contentCache = raw
+        self.interpolation = interpolation
         self.reset()
     }
 
@@ -60,15 +62,14 @@ public class Template {
     }
 
     private func cleanOutput() {
-        let pattern = "(\\{[a-zA-Z0-9-_]+\\})"
-        if let regex = try? NSRegularExpression(pattern: pattern, options: []) {
+        if let regex = try? NSRegularExpression(pattern: interpolation.pattern, options: []) {
             let range = NSRange(location: 0, length: content.utf16.count)
             self.content = regex.stringByReplacingMatches(in: self.content, options: [], range: range, withTemplate: "")
         }
     }
 
     private func nestTag(_ name: String) -> String {
-        return "{nest-\(name)}"
+        return interpolation.format("nest-\(name)")
     }
 
     @discardableResult
@@ -76,7 +77,7 @@ public class Template {
         if let nestContent = nestedContent[nestName] {
             var content = nestContent
             for variable in variables {
-                content = content.replacingOccurrences(of: "{\(variable.key)}", with: "\(variable.value)")
+                content = content.replacingOccurrences(of: interpolation.format(variable.key), with: variable.value.description)
             }
             let nestTag = self.nestTag(nestName)
             self.content = self.content.replacingOccurrences(of: nestTag, with: "\(content)\(nestTag)")
@@ -98,7 +99,7 @@ public class Template {
 
     @discardableResult
     public func assign(_ key: String, _ value: CustomStringConvertible) -> Template {
-        self.content = self.content.replacingOccurrences(of: "{\(key)}", with: "\(value)")
+        self.content = self.content.replacingOccurrences(of: interpolation.format(key), with: value.description)
         return self
     }
     
