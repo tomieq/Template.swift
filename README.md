@@ -48,6 +48,28 @@ for i in 1...3 {
 template.assign(["name": "Thomas"])
 let output = template.output
 ```
+## Support for multiple interpolation types
+In template you can create placeholders with different formats.
+#### Default `{value}`
+```swift
+let template = Template(raw: "{number}")
+template["number"] = 406
+```
+#### Mustache `{{value}}`
+```swift
+let template = Template(raw: "{{number}}", interpolation: .mustache)
+template["number"] = 406
+```
+#### Dollar `$value`
+```swift
+let template = Template(raw: "$number", interpolation: .dollar)
+template["number"] = 406
+```
+#### Dollar with braces `${value}`
+```swift
+let template = Template(raw: "${number}", interpolation: .dollarWithBraces)
+template["number"] = 406
+```
 ### Resource
 
 `Resource` helps load content of files that are located in `/Resources` folder relative to directory from which binary is launched
@@ -65,14 +87,11 @@ In case resource will not find the file it returns nil. Template will be initial
 
 Typical cooperation with Swifter:
 ```swift
-        server.notFoundHandler = { request, responseHeaders in
-            let filePath = Resource().absolutePath(for: request.path)
-            if let response = HttpFileResponse.with(absolutePath: filePath, responseHeaders: responseHeaders) {
-                return response
-            }
-            print("File `\(filePath)` doesn't exist")
-            return .notFound()
-        }
+server.notFoundHandler = { request, _ in
+    let filePath = Resource().absolutePath(for: request.path)
+    try HttpFileResponse.with(absolutePath: filePath, clientCache: .days(7))
+    return .notFound()
+}
 ```
 ### Cache
 
@@ -85,9 +104,8 @@ let template = Template.cahed(absolutePath: "/web/app/Resources/response.tpl.htm
 
 ### Swift Package Manager
 ```
-    
     dependencies: [
-        .package(url: "https://github.com/tomieq/Template.swift.git", from: "1.5.0")
+        .package(url: "https://github.com/tomieq/Template.swift.git", from: "1.6.0")
     ],
     
     ...
