@@ -13,7 +13,7 @@ public class Template {
     private var content: String = ""
     private let contentCache: String
     private var nestedContent: [String: String] = [:]
-    private let nestPattern = #"(\[START)[(\s)+]([a-zA-Z0-9-_]+)\](.+?)(\[END\s[a-zA-Z0-9-_]+\])"#
+    private let nestPattern = #"(\[START)\s+([a-zA-Z0-9-_]+)\](.+?)(\[END\s[a-zA-Z0-9-_]+\])"#
     private let interpolation: TemplateInterpolation
 
     public init(raw: String, interpolation: TemplateInterpolation = .default) {
@@ -50,15 +50,15 @@ public class Template {
     }
 
     private func subContent(from range: NSRange) -> String {
-        let start = range.lowerBound
-        let end = range.lowerBound + range.length - 1
-        return self.subContent(from: start, to: end)
+        guard let swiftRange = Range(range, in: content) else { return "" }
+        return String(content[swiftRange])
     }
 
     private func subContent(from: Int, to: Int) -> String {
-        let start = self.content.index(self.content.startIndex, offsetBy: from)
-        let end = self.content.index(self.content.startIndex, offsetBy: to)
-        return "\(self.content[start...end])"
+        let length = to - from + 1
+        guard length > 0 else { return "" }
+        let nsrange = NSRange(location: from, length: length)
+        return subContent(from: nsrange)
     }
 
     private func cleanOutput() {

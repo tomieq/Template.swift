@@ -38,7 +38,19 @@ final class TemplateTests: XCTestCase {
         }
         XCTAssertEqual("welcomei1i2i3120", template.output)
     }
-
+    func testStringAssignmentWithEmoji() throws {
+        let template = Template(raw: "🌿{number}")
+        template.assign(["number": "45"])
+        XCTAssertEqual("🌿45", template.output)
+    }
+    func testNestAssignmentWithEmoji() throws {
+        let template = Template(raw: "🌿{header}[START item]i{number}[END item]{footer}")
+        template.assign(["header": "welcome", "footer": 120])
+        for i in 1...3 {
+            template.assign(["number": i], inNest: "item")
+        }
+        XCTAssertEqual("🌿welcomei1i2i3120", template.output)
+    }
     func testObjectAssignmentInNest() throws {
         struct ViewModel {
             let number: Int
