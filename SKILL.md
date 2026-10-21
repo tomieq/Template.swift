@@ -104,7 +104,7 @@ Notes:
 
 - The subscript is set-only; `template["x"]` always returns `nil`.
 - Assigning `nil` through the subscript is ignored.
-- Model assignment uses `Mirror`; properties not conforming to `CustomStringConvertible` (e.g. nested non-printable structs) are skipped. Optionals are not `CustomStringConvertible`, so unwrap them first or build a dictionary.
+- Model assignment uses `Mirror`; properties not conforming to `CustomStringConvertible` (e.g. nested non-printable structs) are skipped. Optional properties are unwrapped: the value is inserted when present and `""` when `nil`. (Dictionary values of type `TemplateVariables` cannot be optional; unwrap them yourself.)
 - Values are inserted as-is. Template does not escape HTML; escape user input yourself before assigning it into HTML.
 
 ## Repeated sections

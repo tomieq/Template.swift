@@ -64,6 +64,28 @@ final class TemplateTests: XCTestCase {
         XCTAssertEqual("welcomei1i2i3120", template.output)
     }
     
+    func testOptionalPropertiesInModel() throws {
+        struct ViewModel {
+            let name: String?
+            let nickname: String?
+            let age: Int??
+        }
+        let template = Template(raw: "[{name}][{nickname}][{age}]")
+        template.assign(ViewModel(name: "Tom", nickname: nil, age: 30))
+        XCTAssertEqual("[Tom][][30]", template.output)
+    }
+
+    func testOptionalPropertiesInNest() throws {
+        struct ViewModel {
+            let name: String
+            let note: String?
+        }
+        let template = Template(raw: "[START item]{name}:{note};[END item]")
+        template.assign(ViewModel(name: "a", note: "x"), inNest: "item")
+        template.assign(ViewModel(name: "b", note: nil), inNest: "item")
+        XCTAssertEqual("a:x;b:;", template.output)
+    }
+
     func testSubscriptAssign() throws {
         let template = Template(raw: "{number}")
         template["number"] = 406

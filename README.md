@@ -126,7 +126,7 @@ template.assign(ViewModel(name: "Tom", number: 45))
 print(template.output) // 45 Tom
 ```
 
-Only reflected properties whose values conform to `CustomStringConvertible` are assigned. Assignment methods return the same template, so they can be chained:
+Only reflected properties whose values conform to `CustomStringConvertible` are assigned. Optional properties are unwrapped: a value is inserted when present, and an empty string when `nil`. Assignment methods return the same template, so they can be chained:
 
 ```swift
 let output = Template(raw: "{greeting}, {name}!")

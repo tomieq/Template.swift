@@ -87,14 +87,7 @@ public class Template {
 
     @discardableResult
     public func assign(_ model: Any, inNest nestName: String) -> Template {
-        let mirror = Mirror(reflecting: model)
-        var variables = TemplateVariables()
-        mirror.children.forEach { child in
-            if let key = child.label, let value = child.value as? CustomStringConvertible {
-                variables[key] = value
-            }
-        }
-        return self.assign(variables, inNest: nestName)
+        return self.assign(self.variables(from: model), inNest: nestName)
     }
 
     @discardableResult
@@ -123,13 +116,26 @@ public class Template {
     
     @discardableResult
     public func assign(_ model: Any) -> Template {
-        let mirror = Mirror(reflecting: model)
-        mirror.children.forEach { child in
-            if let key = child.label, let value = child.value as? CustomStringConvertible {
-                self.assign(key, value)
+        return self.assign(self.variables(from: model))
+    }
+
+    // Optional properties contribute their wrapped value, or "" when nil.
+    private func variables(from model: Any) -> TemplateVariables {
+        var variables = TemplateVariables()
+        for child in Mirror(reflecting: model).children {
+            guard let key = child.label else { continue }
+            var value: Any = child.value
+            while Mirror(reflecting: value).displayStyle == .optional {
+                guard let wrapped = Mirror(reflecting: value).children.first else {
+                    break
+                }
+                value = wrapped.value
+            }
+            if let value = value as? CustomStringConvertible {
+                variables[key] = value
             }
         }
-        return self
+        return variables
     }
 
     public var output: String {
