@@ -60,7 +60,7 @@ print(template.output) // Hello, Thomas! You have 3 messages.
 | `reset()` | Restore the original raw template and clear section copies |
 | `Template.load(relativePath:)` / `load(absolutePath:)` | Read a template file on every call |
 | `Template.cached(relativePath:)` / `cached(absolutePath:)` | Read a template file once, cache content in memory |
-| `Resource(workingDir:)` | `absolutePath(for:)` and `content(for:)` for files under `<workingDir>/Resources/` |
+| `Resource(workingDir:)` | `absolutePath(for:)`, `content(for:)` and `existingFilePath(for:inside:)` for files under `<workingDir>/Resources/` |
 | `TemplateInterpolation` | `.default`, `.mustache`, `.dollar`, `.dollarWithBraces` |
 | `TemplateVariables` | Typealias for `[String: CustomStringConvertible]` |
 
@@ -156,7 +156,13 @@ let other = Template.load(absolutePath: "/web/app/Resources/page.tpl.html")
 let resource = Resource(workingDir: "/web/app")
 let path = resource.absolutePath(for: "page.tpl.html")
 let text: String? = resource.content(for: "page.tpl.html")
+
+// Untrusted input (e.g. a URL path): confined to Resources/public, nil when unsafe or missing
+let servable: String? = resource.existingFilePath(for: "css/style.css", inside: "public")
 ```
+
+- `absolutePath(for:)` and `content(for:)` do no sanitising; never pass untrusted input to them. `content(for:)` reads text only (not binary files).
+- `existingFilePath(for:inside:)` rejects `..`, dot-prefixed segments, backslashes, NUL, directories, missing files and symlinks leaving the folder. Use it, then stream the file with your HTTP library.
 
 - On read failure, `load`/`cached` print a diagnostic and return an empty template (no throw).
 - `load` and `cached` always use `.default` (`{name}`) interpolation. For another style, read the text and construct manually:

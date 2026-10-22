@@ -18,6 +18,26 @@ public struct Resource {
         "\(self.workingDir)/Resources/\(relativePath)"
     }
 
+    /// Absolute path of an existing regular file inside `<workingDir>/Resources/<folder>`, safe to serve for untrusted input.
+    /// Returns `nil` for traversal (`..`), hidden (dot-prefixed) segments, backslashes, NUL, directories,
+    /// missing files and symlinks that lead outside the folder.
+    public func existingFilePath(for relativePath: String, inside folder: String) -> String? {
+        let segments = relativePath.split(separator: "/")
+        guard !segments.isEmpty,
+              segments.allSatisfy({ !$0.hasPrefix(".") && !$0.contains("\\") && !$0.contains("\0") }) else {
+            return nil
+        }
+        let root = URL(fileURLWithPath: absolutePath(for: folder)).resolvingSymlinksInPath().path
+        let candidate = URL(fileURLWithPath: root + "/" + segments.joined(separator: "/")).resolvingSymlinksInPath().path
+        var isDirectory: ObjCBool = false
+        guard candidate.hasPrefix(root + "/"),
+              FileManager.default.fileExists(atPath: candidate, isDirectory: &isDirectory),
+              !isDirectory.boolValue else {
+            return nil
+        }
+        return candidate
+    }
+
     public func content(for relativePath: String) -> String? {
         let resourcePath = absolutePath(for: relativePath)
         guard let content = try? String(contentsOfFile: resourcePath) else {

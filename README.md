@@ -200,6 +200,13 @@ let content = resource.content(for: "response.tpl.html")
 let resource = Resource(workingDir: "/web/app")
 ```
 
+To serve files for untrusted input (for example URL paths), use `existingFilePath(for:inside:)`. It returns the absolute path of an existing regular file inside `Resources/<folder>`, or `nil` for path traversal (`..`), hidden (dot-prefixed) segments, backslashes, NUL, directories, missing files and symlinks that leave the folder:
+
+```swift
+let path = Resource().existingFilePath(for: requestPath, inside: "public")
+// <current working directory>/Resources/public/<requestPath>, or nil
+```
+
 Create a template directly from a file:
 
 ```swift
