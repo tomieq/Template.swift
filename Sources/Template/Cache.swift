@@ -9,14 +9,17 @@ import Foundation
 
 class Cache {
     static let shared = Cache()
-    var fileContents: [String: String] = [:]
+    private var fileContents: [String: String] = [:]
+    private let lock = NSLock()
 
     func get(relativePath: String) -> String? {
         self.get(absolutePath: Resource().absolutePath(for: relativePath))
     }
-    
+
     func get(absolutePath: String) -> String? {
-        if let cached = fileContents[absolutePath] {
+        self.lock.lock()
+        defer { self.lock.unlock() }
+        if let cached = self.fileContents[absolutePath] {
             return cached
         }
         guard let content = try? String(contentsOfFile: absolutePath) else {
